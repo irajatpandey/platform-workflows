@@ -1,4 +1,6 @@
 name: python-ci-pipeline
+on:
+  workflow_call:
 jobs:
   sonar:
     runs-on: ubuntu-latest
