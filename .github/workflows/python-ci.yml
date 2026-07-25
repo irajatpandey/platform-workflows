@@ -5,4 +5,5 @@ jobs:
   sonar:
     runs-on: ubuntu-latest
     steps:
-     - uses: ./.github/actions/common-setup
+     - uses: ./.github/actions/common-setup@master
+    

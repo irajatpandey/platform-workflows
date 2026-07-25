@@ -1,0 +1,17 @@
+name: Common Setup
+description: Common setup for CI pipelines
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }} 
+        
+    - name: Print Version
+      shell: bash
+      run: python --version
