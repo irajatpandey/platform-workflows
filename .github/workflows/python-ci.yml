@@ -5,5 +5,5 @@ jobs:
   Python Pipeline :
     runs-on: ubuntu-latest
     steps:
-     - uses: ./.github/actions/common-setup@master
+     - uses: ./.github/actions/common-setup
     
