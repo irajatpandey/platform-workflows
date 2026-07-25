@@ -1,6 +1,12 @@
 name: python-ci-pipeline
 on:
   workflow_call:
+    inputs:
+      python-version:
+        description: Python version
+        required: false
+        type: string
+        default: "3.12"
 jobs:
   python-pipeline:
     name: Python Pipeline
@@ -8,4 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
      - uses: ./.github/actions/common-setup
+       with:
+         python-version: ${{ inputs.python-version }}
     
