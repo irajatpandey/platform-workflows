@@ -2,7 +2,9 @@ name: python-ci-pipeline
 on:
   workflow_call:
 jobs:
-  Python Pipeline :
+  python-pipeline:
+    name: Python Pipeline
+
     runs-on: ubuntu-latest
     steps:
      - uses: ./.github/actions/common-setup
