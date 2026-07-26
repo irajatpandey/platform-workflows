@@ -31,4 +31,3 @@ jobs:
 
       - name: Run Gitleaks
         uses: irajatpandey/platform-workflows/.github/actions/steps/run-gitleaks@master
-     
