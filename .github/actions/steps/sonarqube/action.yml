@@ -29,6 +29,11 @@ inputs:
   exclusions:
     required: false
     default: ""
+  
+  sonar-token:
+    description: SonarQube token
+    required: true
+    type: string
 
 runs:
   using: composite
