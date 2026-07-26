@@ -6,7 +6,6 @@ runs:
 
   steps:
     - uses: actions/checkout@v4
-
     - name: Install Gitleaks
       shell: bash
       run: |
@@ -25,12 +24,11 @@ runs:
         gitleaks detect --source . --report-format sarif --report-path reports/gitleaks.sarif --no-git
 
     - name: Create Gitleaks HTML Report
-      if: ${{ inputs.install-gitleaks == 'true' }}
       shell: bash
       run: |
         mkdir -p reports
         if [ -f reports/gitleaks.json ]; then
-          python3 "${{ github.action_path }}/steps/generate_gitleaks_report.py"
+          python3 "${{ github.action_path }}/../generate_gitleaks_report.py"
           cd reports
           zip -r gitleaks-report.zip gitleaks-report.html
           ls -R .
