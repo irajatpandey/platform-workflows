@@ -8,6 +8,11 @@ on:
         required: false
         type: string
         default: "3.12"
+    
+      exclusions:
+        required: false
+        default: ""
+    
       java-version:
         description: Java version
         required: false
