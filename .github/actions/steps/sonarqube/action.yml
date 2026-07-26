@@ -4,6 +4,8 @@ description: Generate Sonar properties and run Sonar scan
 inputs:
   project-key:
     required: true
+    type: string
+    default: "irajatpandey_platform-workflows"
 
   project-name:
     required: true

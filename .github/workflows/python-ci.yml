@@ -19,6 +19,7 @@ on:
         required: false
         type: string
         default: "17"
+      
 
 jobs:
   python-ci:
@@ -72,4 +73,5 @@ jobs:
         with:
          project-key: my-python-app
          exclusions: ${{ inputs.exclusions }}
+         
       
