@@ -1,0 +1,24 @@
+name: Setup Java
+description: Checkout and setup Java environment
+
+inputs:
+  java-version:
+    description: Java version
+    required: false
+    default: "17"
+
+runs:
+  using: composite
+
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: ${{ inputs.java-version }}
+
+    - name: Print Java Version
+      shell: bash
+      run: java -version

@@ -19,12 +19,16 @@ jobs:
     name: Python CI
     runs-on: ubuntu-latest
     steps:
-      - name: Run Common Setup
-        uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
+      - name: Setup Python
+        uses: irajatpandey/platform-workflows/.github/actions/setup-python@master
         with:
           python-version: ${{ inputs.python-version }}
+
+      - name: Setup Java
+        uses: irajatpandey/platform-workflows/.github/actions/setup-java@master
+        with:
           java-version: ${{ inputs.java-version }}
-          setup-python: "true"
-          setup-java: "true"
-          install-gitleaks: "true"
+
+      - name: Run Gitleaks
+        uses: irajatpandey/platform-workflows/.github/actions/run-gitleaks@master
      
