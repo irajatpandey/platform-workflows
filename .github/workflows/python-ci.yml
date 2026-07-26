@@ -10,6 +10,7 @@ on:
         default: "3.12"
     
       exclusions:
+        type: string
         required: false
         default: ""
     
