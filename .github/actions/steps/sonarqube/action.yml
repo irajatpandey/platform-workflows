@@ -1,40 +1,42 @@
 name: SonarQube Scan
 description: Generate Sonar properties and run Sonar scan
+workflow_call:
+  inputs:
+    project-key:
+      required: true
+      type: string
+      default: "irajatpandey_platform-workflows"
 
-inputs:
-  project-key:
-    required: true
-    type: string
-    default: "irajatpandey_platform-workflows"
+    project-name:
+      required: true
 
-  project-name:
-    required: true
+    sources:
+      required: false
+      default: "."
 
-  sources:
-    required: false
-    default: "."
+    tests:
+      required: false
+      default: "tests"
 
-  tests:
-    required: false
-    default: "tests"
+    coverage-report:
+      required: false
+      default: "coverage.xml"
 
-  coverage-report:
-    required: false
-    default: "coverage.xml"
+    test-report:
+      required: false
+      default: "test-results.xml"
 
-  test-report:
-    required: false
-    default: "test-results.xml"
-
-  exclusions:
-    required: false
-    default: ""
-  
-  sonar-token:
-    description: SonarQube token
-    required: true
-    type: string
-
+    exclusions:
+      required: false
+      default: ""
+    
+    sonar-token:
+      description: SonarQube token
+      required: true
+      type: string
+  secrets:
+      SONAR_TOKEN:
+        required: true
 runs:
   using: composite
 
@@ -55,7 +57,7 @@ runs:
     - name: Run SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v8
       env:
-        SONAR_TOKEN: ${{ inputs.sonar-token }}  
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
       with:
           args: >
             -Dsonar.qualitygate.wait=true
