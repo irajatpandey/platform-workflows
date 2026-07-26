@@ -20,9 +20,9 @@ on:
         type: string
         default: "17"
 
-      secrets:
-        SONAR_TOKEN:
-          required: true
+    secrets:
+      SONAR_TOKEN:
+        required: true
       
       
 
