@@ -1,0 +1,54 @@
+name: SonarQube Scan
+description: Generate Sonar properties and run Sonar scan
+
+inputs:
+  project-key:
+    required: true
+
+  project-name:
+    required: true
+
+  sources:
+    required: false
+    default: "."
+
+  tests:
+    required: false
+    default: "tests"
+
+  coverage-report:
+    required: false
+    default: "coverage.xml"
+
+  test-report:
+    required: false
+    default: "test-results.xml"
+
+  exclusions:
+    required: false
+    default: ""
+
+runs:
+  using: composite
+
+  steps:
+    - name: Generate sonar-project.properties
+      shell: bash
+      run: |
+        cp "${{ github.action_path }}/sonar-project.properties.template" sonar-project.properties
+
+        sed -i "s|@PROJECT_KEY@|${{ inputs.project-key }}|g" sonar-project.properties
+        sed -i "s|@PROJECT_NAME@|${{ inputs.project-name }}|g" sonar-project.properties
+        sed -i "s|@SOURCES@|${{ inputs.sources }}|g" sonar-project.properties
+        sed -i "s|@TESTS@|${{ inputs.tests }}|g" sonar-project.properties
+        sed -i "s|@COVERAGE_REPORT@|${{ inputs.coverage-report }}|g" sonar-project.properties
+        sed -i "s|@TEST_REPORT@|${{ inputs.test-report }}|g" sonar-project.properties
+        sed -i "s|@EXCLUSIONS@|${{ inputs.exclusions }}|g" sonar-project.properties
+
+    - name: Run SonarQube Scan
+      uses: SonarSource/sonarqube-scan-action@v8
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+      with:
+          args: >
+            -Dsonar.qualitygate.wait=true

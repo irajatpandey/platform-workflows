@@ -1,0 +1,12 @@
+sonar.projectKey=@PROJECT_KEY@
+sonar.projectName=@PROJECT_NAME@
+sonar.sources=@SOURCES@
+sonar.tests=@TESTS@
+sonar.sourceEncoding=UTF-8
+
+# Coverage
+sonar.python.coverage.reportPaths=@COVERAGE_REPORT@
+sonar.python.xunit.reportPath=@TEST_REPORT@
+
+# Exclusions
+sonar.exclusions=@EXCLUSIONS@
