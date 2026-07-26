@@ -20,6 +20,11 @@ on:
         type: string
         default: "17"
       
+      sonar-token:
+        description: SonarQube token
+        required: true
+        type: string
+      
 
 jobs:
   python-ci:
@@ -71,7 +76,9 @@ jobs:
       - name: SAST/SonarQube Analysis
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
-         project-key: my-python-app
+         project-key: irajatpandey_platform-workflows
          exclusions: ${{ inputs.exclusions }}
+        env:
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
          
       

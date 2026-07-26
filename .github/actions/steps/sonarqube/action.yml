@@ -50,7 +50,7 @@ runs:
     - name: Run SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v8
       env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  
+        SONAR_TOKEN: ${{ inputs.sonar-token }}  
       with:
           args: >
             -Dsonar.qualitygate.wait=true
