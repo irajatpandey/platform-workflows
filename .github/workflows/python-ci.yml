@@ -68,7 +68,7 @@ jobs:
             coverage.xml
             htmlcov/
       - name: SAST/SonarQube Analysis
-        uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube/sonar@master
+        uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube/sonar.yml@master
         with:
          project-key: my-python-app
          exclusions: ${{ inputs.exclusions }}
