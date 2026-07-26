@@ -15,141 +15,16 @@ on:
         default: "17"
 
 jobs:
-  python-setup:
-    name: Python Setup
+  ci:
+    name: Python CI
     runs-on: ubuntu-latest
     steps:
-      - uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
+      - name: Common setup
+        uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
         with:
           python-version: ${{ inputs.python-version }}
-          #setup-python: "true"
-          #setup-java: "false"
-          install-gitleaks: "true"
-
-  jdk-setup:
-    name: JDK Setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
-        with:
           java-version: ${{ inputs.java-version }}
-          setup-python: "false"
+          setup-python: "true"
           setup-java: "true"
-          install-gitleaks: "false"
-
-  gitleaks-scan:
-    name: Gitleaks Scan
-    #needs: [python-setup, jdk-setup]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
-        with:
-          setup-python: "false"
-          setup-java: "false"
           install-gitleaks: "true"
-
-      - name: Run Gitleaks Scan
-        shell: bash
-        run: |
-          mkdir -p reports
-          gitleaks detect --source . --report-format json --report-path reports/gitleaks.json --no-git
-          gitleaks detect --source . --report-format sarif --report-path reports/gitleaks.sarif --no-git
-
-      - name: Upload Gitleaks Scan Results
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-scan-results
-          path: reports/
-
-  gitleaks-html-report:
-    name: Gitleaks HTML Report
-    needs: gitleaks-scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
-        with:
-          setup-python: "false"
-          setup-java: "false"
-          install-gitleaks: "false"
-
-      - name: Download Scan Results
-        uses: actions/download-artifact@v4
-        with:
-          name: gitleaks-scan-results
-          path: reports
-
-      - name: Create HTML Report
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          report_path = Path("reports/gitleaks.json")
-          html_path = Path("reports/gitleaks-report.html")
-          findings = []
-
-          if report_path.exists():
-              data = json.loads(report_path.read_text())
-              findings = data if isinstance(data, list) else data.get("findings", [])
-
-          html = f"""<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Gitleaks Report</title></head><body><h1>Gitleaks Report</h1><p>Total findings: {len(findings)}</p><table><tr><th>Description</th><th>File</th><th>Line</th></tr>{''.join(f'<tr><td>{item.get("Description", "N/A")}</td><td>{item.get("File", "N/A")}</td><td>{item.get("Line", "N/A")}</td></tr>' for item in findings)}</table></body></html>"""
-          html_path.write_text(html)
-          print(f"Created report at {html_path}")
-          PY
-
-      - name: Upload HTML Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-html-report
-          path: reports/gitleaks-report.html
-
-  gitleaks-publish-artifacts:
-    name: Gitleaks Publish Artifacts
-    needs: gitleaks-html-report
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download HTML Report
-        uses: actions/download-artifact@v4
-        with:
-          name: gitleaks-html-report
-          path: artifacts
-
-      - name: Publish Artifact Summary
-        run: |
-          echo "Publishing Gitleaks artifacts"
-          ls -R artifacts
-
-      - name: Upload Published Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: gitleaks-published-artifacts
-          path: artifacts/
-
-  gitleaks-upload-artifactory:
-    name: Gitleaks Upload Artifactory
-    needs: gitleaks-publish-artifacts
-    runs-on: ubuntu-latest
-    env:
-      ARTIFACTORY_URL: ${{ vars.ARTIFACTORY_URL || '' }}
-      ARTIFACTORY_USERNAME: ${{ vars.ARTIFACTORY_USERNAME || '' }}
-      ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD || '' }}
-    steps:
-      - name: Download Published Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: gitleaks-published-artifacts
-          path: artifacts
-
-      - name: Upload Report to Artifactory
-        shell: bash
-        run: |
-          if [ -z "$ARTIFACTORY_URL" ] || [ -z "$ARTIFACTORY_USERNAME" ] || [ -z "$ARTIFACTORY_PASSWORD" ]; then
-            echo "Artifactory credentials not configured. Skipping upload."
-            exit 0
-          fi
-
-          curl -u "$ARTIFACTORY_USERNAME:$ARTIFACTORY_PASSWORD" \
-            -T artifacts/gitleaks-report.html \
-            "$ARTIFACTORY_URL/gitleaks-report.html"
      
