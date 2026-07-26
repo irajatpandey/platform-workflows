@@ -1,42 +1,44 @@
 name: SonarQube Scan
-description: Generate Sonar properties and run Sonar scan
-workflow_call:
-  inputs:
-    project-key:
-      required: true
-      type: string
-      default: "irajatpandey_platform-workflows"
+description: Generate Sonar properties and run SonarQube scan
 
-    project-name:
-      required: true
+inputs:
+  project-key:
+    description: Sonar Project Key
+    required: true
 
-    sources:
-      required: false
-      default: "."
+  project-name:
+    description: Sonar Project Name
+    required: true
 
-    tests:
-      required: false
-      default: "tests"
+  sources:
+    description: Source directory
+    required: false
+    default: "."
 
-    coverage-report:
-      required: false
-      default: "coverage.xml"
+  tests:
+    description: Test directory
+    required: false
+    default: "tests"
 
-    test-report:
-      required: false
-      default: "test-results.xml"
+  coverage-report:
+    description: Coverage report
+    required: false
+    default: "coverage.xml"
 
-    exclusions:
-      required: false
-      default: ""
-    
-    sonar-token:
-      description: SonarQube token
-      required: true
-      type: string
-  secrets:
-      SONAR_TOKEN:
-        required: true
+  test-report:
+    description: Test report
+    required: false
+    default: "test-results.xml"
+
+  exclusions:
+    description: Sonar exclusions
+    required: false
+    default: ""
+
+  sonar-token:
+    description: Sonar Token
+    required: true
+
 runs:
   using: composite
 
@@ -55,9 +57,9 @@ runs:
         sed -i "s|@EXCLUSIONS@|${{ inputs.exclusions }}|g" sonar-project.properties
 
     - name: Run SonarQube Scan
-      uses: SonarSource/sonarqube-scan-action@v8
+      uses: SonarSource/sonarqube-scan-action@v5
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       with:
-          args: >
-            -Dsonar.qualitygate.wait=true
+        args: >
+          -Dsonar.qualitygate.wait=true

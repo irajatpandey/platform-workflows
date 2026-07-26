@@ -1,4 +1,4 @@
-name: python-ci-pipeline 
+name: python-ci-pipeline
 
 on:
   workflow_call:
@@ -8,12 +8,13 @@ on:
         required: false
         type: string
         default: "3.12"
-    
+
       exclusions:
-        type: string
+        description: Sonar exclusions
         required: false
+        type: string
         default: ""
-    
+
       java-version:
         description: Java version
         required: false
@@ -23,13 +24,12 @@ on:
     secrets:
       SONAR_TOKEN:
         required: true
-      
-      
 
 jobs:
   python-ci:
     name: Python CI
     runs-on: ubuntu-latest
+
     steps:
       - name: Setup Python
         uses: irajatpandey/platform-workflows/.github/actions/steps/setup-python@master
@@ -46,24 +46,24 @@ jobs:
 
       - name: Upload HTML Report
         uses: irajatpandey/platform-workflows/.github/actions/steps/upload-artifact@master
-      
+
       - name: Run Unit Tests and Code Coverage
+        shell: bash
         run: |
-          echo "Running unit tests and code coverage..."
-          # Add your unit test and code coverage commands here
           pip install -r requirements.txt
           pip install pytest pytest-cov
+
           pytest \
-          --junitxml=test-results.xml \
-          --cov=. \
-          --cov-report=term-missing \
-          --cov-report=xml:coverage.xml \
-          --cov-report=html:htmlcov
+            --junitxml=test-results.xml \
+            --cov=. \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html:htmlcov
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
-          name: test-results 
+          name: test-results
           path: test-results.xml
 
       - name: Upload Coverage Report
@@ -73,11 +73,11 @@ jobs:
           path: |
             coverage.xml
             htmlcov/
-      - name: SAST/SonarQube Analysis
+
+      - name: SAST / SonarQube Analysis
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
-         project-key: irajatpandey_platform-workflows
-         exclusions: ${{ inputs.exclusions }}
-         sonar-token: ${{ inputs.sonar-token }}
-         
-      
+          project-key: irajatpandey_platform-workflows
+          project-name: Platform Workflows
+          exclusions: ${{ inputs.exclusions }}
+          sonar-token: ${{ secrets.SONAR_TOKEN }}
