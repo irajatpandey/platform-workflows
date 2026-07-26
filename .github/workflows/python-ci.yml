@@ -70,4 +70,5 @@ jobs:
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube/sonar@master
         with:
          project-key: my-python-app
+         exclusions: ${{ inputs.exclusions }}
       
