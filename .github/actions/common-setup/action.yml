@@ -77,7 +77,7 @@ runs:
       run: |
         mkdir -p reports
         if [ -f reports/gitleaks.json ]; then
-          python3 .github/actions/common-setup/generate_gitleaks_report.py
+          python3 "${{ github.action_path }}/generate_gitleaks_report.py"
           cd reports
           zip -r gitleaks-report.zip gitleaks-report.html
           ls -R .
