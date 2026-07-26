@@ -31,3 +31,6 @@ jobs:
 
       - name: Run Gitleaks
         uses: irajatpandey/platform-workflows/.github/actions/steps/run-gitleaks@master
+
+      - name: Upload HTML Report
+        uses: irajatpandey/platform-workflows/.github/actions/steps/upload-artifact@master

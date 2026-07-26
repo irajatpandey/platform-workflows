@@ -1,0 +1,24 @@
+name: Upload Artifact
+description: Upload HTML report and artifacts
+
+inputs:
+  artifact-name:
+    description: Name of the artifact
+    required: false
+    default: gitleaks-html-report
+  artifact-path:
+    description: Path to upload
+    required: false
+    default: |
+      reports/gitleaks-report.html
+      reports/gitleaks-report.zip
+
+runs:
+  using: composite
+
+  steps:
+    - name: Upload HTML Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.artifact-path }}

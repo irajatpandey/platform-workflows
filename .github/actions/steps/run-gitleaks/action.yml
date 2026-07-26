@@ -33,11 +33,3 @@ runs:
           zip -r gitleaks-report.zip gitleaks-report.html
           ls -R .
         fi
-
-    - name: Upload HTML Report
-      uses: actions/upload-artifact@v4
-      with:
-        name: gitleaks-html-report
-        path: |
-          reports/gitleaks-report.html
-          reports/gitleaks-report.zip
