@@ -20,15 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Python
-        uses: irajatpandey/platform-workflows/.github/actions/setup-python@master
+        uses: irajatpandey/platform-workflows/.github/actions/steps/setup-python@master
         with:
           python-version: ${{ inputs.python-version }}
 
       - name: Setup Java
-        uses: irajatpandey/platform-workflows/.github/actions/setup-java@master
+        uses: irajatpandey/platform-workflows/.github/actions/steps/setup-java@master
         with:
           java-version: ${{ inputs.java-version }}
 
       - name: Run Gitleaks
-        uses: irajatpandey/platform-workflows/.github/actions/run-gitleaks@master
+        uses: irajatpandey/platform-workflows/.github/actions/steps/run-gitleaks@master
      
