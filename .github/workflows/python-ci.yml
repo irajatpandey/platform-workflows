@@ -15,16 +15,38 @@ on:
         default: "17"
 
 jobs:
-  ci:
-    name: Python CI
+  setup-python:
+    name: Setup Python
     runs-on: ubuntu-latest
     steps:
-      - name: Common setup
+      - name: Run shared setup
         uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
         with:
           python-version: ${{ inputs.python-version }}
-          java-version: ${{ inputs.java-version }}
           setup-python: "true"
+          setup-java: "false"
+          install-gitleaks: "false"
+
+  setup-java:
+    name: Setup Java
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run shared setup
+        uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
+        with:
+          java-version: ${{ inputs.java-version }}
+          setup-python: "false"
           setup-java: "true"
+          install-gitleaks: "false"
+
+  gitleaks:
+    name: Gitleaks Scan and Report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run shared setup
+        uses: irajatpandey/platform-workflows/.github/actions/common-setup@master
+        with:
+          setup-python: "false"
+          setup-java: "false"
           install-gitleaks: "true"
      
