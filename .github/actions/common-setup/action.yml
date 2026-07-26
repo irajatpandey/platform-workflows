@@ -46,7 +46,7 @@ runs:
       with:
         distribution: temurin
         java-version: ${{ inputs.java-version }}
-        
+
     - name: Print Java Version
       if: ${{ inputs.setup-java == 'true' }}
       shell: bash
@@ -64,6 +64,7 @@ runs:
         gitleaks version
     
     - name: Run Gitleaks Scan
+      if: ${{ inputs.install-gitleaks == 'true' }}
       shell: bash
       run: |
         mkdir -p reports
@@ -76,28 +77,14 @@ runs:
       run: |
         mkdir -p reports
         if [ -f reports/gitleaks.json ]; then
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          report_path = Path("reports/gitleaks.json")
-          html_path = Path("reports/gitleaks-report.html")
-          findings = []
-
-          if report_path.exists():
-              data = json.loads(report_path.read_text())
-              findings = data if isinstance(data, list) else data.get("findings", [])
-
-          html = f"""<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Gitleaks Report</title></head><body><h1>Gitleaks Report</h1><p>Total findings: {len(findings)}</p><table><tr><th>Description</th><th>File</th><th>Line</th></tr>{''.join(f'<tr><td>{item.get("Description", "N/A")}</td><td>{item.get("File", "N/A")}</td><td>{item.get("Line", "N/A")}</td></tr>' for item in findings)}</table></body></html>"""
-          html_path.write_text(html)
-          print(f"Created report at {html_path}")
-          PY
+          python3 .github/actions/common-setup/generate_gitleaks_report.py
           cd reports
           zip -r gitleaks-report.zip gitleaks-report.html
           ls -R .
         fi
 
     - name: Upload HTML Report
+      if: ${{ inputs.install-gitleaks == 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: gitleaks-html-report
