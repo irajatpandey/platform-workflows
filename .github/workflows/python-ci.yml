@@ -1,4 +1,4 @@
-name: python-ci-pipeline
+name: python-ci-pipeline 
 
 on:
   workflow_call:
