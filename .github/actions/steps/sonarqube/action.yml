@@ -2,6 +2,10 @@ name: SonarQube Scan
 description: Generate Sonar properties and run SonarQube scan
 
 inputs:
+  organization:
+    description: SonarCloud Organization
+    required: true
+    
   project-key:
     description: Sonar Project Key
     required: true
