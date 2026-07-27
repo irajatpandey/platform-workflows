@@ -5,7 +5,7 @@ inputs:
   organization:
     description: SonarCloud Organization
     required: true
-    
+
   project-key:
     description: Sonar Project Key
     required: true
@@ -59,11 +59,19 @@ runs:
         sed -i "s|@COVERAGE_REPORT@|${{ inputs.coverage-report }}|g" sonar-project.properties
         sed -i "s|@TEST_REPORT@|${{ inputs.test-report }}|g" sonar-project.properties
         sed -i "s|@EXCLUSIONS@|${{ inputs.exclusions }}|g" sonar-project.properties
-
+    
+    - name: Verify generated properties
+      shell: bash
+      run: |
+        echo "===== sonar-project.properties ====="
+        cat sonar-project.properties
+    
     - name: Run SonarQube Scan
       uses: SonarSource/sonarqube-scan-action@v5
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       with:
         args: >
+          -Dproject.settings=sonar-project.properties
+          -Dsonar.organization=${{ inputs.organization }}
           -Dsonar.qualitygate.wait=true
