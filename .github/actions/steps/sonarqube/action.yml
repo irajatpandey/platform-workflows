@@ -1,5 +1,5 @@
 name: SonarQube Scan
-description: Generate Sonar properties and run SonarQube scan
+description: Generate Sonar properties and run SonarCloud scan
 
 inputs:
   organization:
@@ -19,20 +19,10 @@ inputs:
     required: false
     default: "."
 
-  tests:
-    description: Test directory
-    required: false
-    default: "tests"
-
   coverage-report:
     description: Coverage report
     required: false
     default: "coverage.xml"
-
-  test-report:
-    description: Test report
-    required: false
-    default: "test-results.xml"
 
   exclusions:
     description: Sonar exclusions
@@ -54,11 +44,11 @@ runs:
 
         sed -i "s|@PROJECT_KEY@|${{ inputs.project-key }}|g" sonar-project.properties
         sed -i "s|@PROJECT_NAME@|${{ inputs.project-name }}|g" sonar-project.properties
+        sed -i "s|@ORGANIZATION@|${{ inputs.organization }}|g" sonar-project.properties
         sed -i "s|@SOURCES@|${{ inputs.sources }}|g" sonar-project.properties
         sed -i "s|@COVERAGE_REPORT@|${{ inputs.coverage-report }}|g" sonar-project.properties
         sed -i "s|@EXCLUSIONS@|${{ inputs.exclusions }}|g" sonar-project.properties
-    
-    # ADD HERE
+
     - name: Validate Sonar Token
       shell: bash
       run: |
@@ -69,20 +59,19 @@ runs:
       shell: bash
       run: |
         curl -u "${{ inputs.sonar-token }}:" \
-          "https://sonarcloud.io/api/projects/search?projects=irajatpandey_Learning-Github-Actions"
-          
+          "https://sonarcloud.io/api/components/show?organization=${{ inputs.organization }}&component=${{ inputs.project-key }}"
+
     - name: Verify generated properties
       shell: bash
       run: |
         echo "===== sonar-project.properties ====="
         cat sonar-project.properties
-    
-    - name: Run SonarQube Scan
+
+    - name: Run SonarCloud Scan
       uses: SonarSource/sonarqube-scan-action@v5
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       with:
         args: >
           -Dproject.settings=sonar-project.properties
-          -Dsonar.organization=${{ inputs.organization }}
           -Dsonar.qualitygate.wait=true

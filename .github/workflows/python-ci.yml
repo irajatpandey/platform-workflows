@@ -80,5 +80,6 @@ jobs:
           project-key: irajatpandey_Learning-Github-Actions
           project-name: Learning-Github-Actions
           organization: irajatpandey
+          sources: .
           exclusions: ${{ inputs.exclusions }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
