@@ -70,7 +70,7 @@ runs:
       run: |
         curl -u "${{ inputs.sonar-token }}:" \
           "https://sonarcloud.io/api/projects/search?projects=irajatpandey_Learning-Github-Actions"
-          ß
+          
     - name: Verify generated properties
       shell: bash
       run: |
