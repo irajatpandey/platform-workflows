@@ -77,8 +77,8 @@ jobs:
       - name: SAST / SonarQube Analysis
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
-          project-key: irajatpandey_platform-workflows
-          project-name: Platform Workflows
+          project-key: irajatpandey_Learning-Github-Actions
+          project-name: Learning-Github-Actions
           organization: irajatpandey
           exclusions: ${{ inputs.exclusions }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
