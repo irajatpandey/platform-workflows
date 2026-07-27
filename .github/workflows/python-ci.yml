@@ -79,5 +79,6 @@ jobs:
         with:
           project-key: irajatpandey_platform-workflows
           project-name: Platform Workflows
+          organization: irajatpandey
           exclusions: ${{ inputs.exclusions }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}

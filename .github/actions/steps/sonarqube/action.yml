@@ -55,9 +55,7 @@ runs:
         sed -i "s|@PROJECT_KEY@|${{ inputs.project-key }}|g" sonar-project.properties
         sed -i "s|@PROJECT_NAME@|${{ inputs.project-name }}|g" sonar-project.properties
         sed -i "s|@SOURCES@|${{ inputs.sources }}|g" sonar-project.properties
-        sed -i "s|@TESTS@|${{ inputs.tests }}|g" sonar-project.properties
         sed -i "s|@COVERAGE_REPORT@|${{ inputs.coverage-report }}|g" sonar-project.properties
-        sed -i "s|@TEST_REPORT@|${{ inputs.test-report }}|g" sonar-project.properties
         sed -i "s|@EXCLUSIONS@|${{ inputs.exclusions }}|g" sonar-project.properties
     
     - name: Verify generated properties
