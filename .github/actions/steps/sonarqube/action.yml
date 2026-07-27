@@ -58,6 +58,19 @@ runs:
         sed -i "s|@COVERAGE_REPORT@|${{ inputs.coverage-report }}|g" sonar-project.properties
         sed -i "s|@EXCLUSIONS@|${{ inputs.exclusions }}|g" sonar-project.properties
     
+    # ADD HERE
+    - name: Validate Sonar Token
+      shell: bash
+      run: |
+        curl -u "${{ inputs.sonar-token }}:" \
+          "https://sonarcloud.io/api/authentication/validate"
+
+    - name: Check Sonar Project
+      shell: bash
+      run: |
+        curl -u "${{ inputs.sonar-token }}:" \
+          "https://sonarcloud.io/api/projects/search?projects=irajatpandey_Learning-Github-Actions"
+          ß
     - name: Verify generated properties
       shell: bash
       run: |
