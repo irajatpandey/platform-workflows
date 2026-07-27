@@ -1,5 +1,5 @@
-name: SonarQube Scan
-description: Generate Sonar properties and run SonarCloud scan
+name: SonarCloud Scan
+description: Run SonarCloud Scan
 
 inputs:
   organization:
@@ -7,11 +7,11 @@ inputs:
     required: true
 
   project-key:
-    description: Sonar Project Key
+    description: SonarCloud Project Key
     required: true
 
   project-name:
-    description: Sonar Project Name
+    description: SonarCloud Project Name
     required: true
 
   sources:
@@ -30,7 +30,7 @@ inputs:
     default: ""
 
   sonar-token:
-    description: Sonar Token
+    description: SonarCloud Token
     required: true
 
 runs:
@@ -40,26 +40,15 @@ runs:
     - name: Generate sonar-project.properties
       shell: bash
       run: |
-        cp "${{ github.action_path }}/sonar-project.properties.template" sonar-project.properties
-
-        sed -i "s|@PROJECT_KEY@|${{ inputs.project-key }}|g" sonar-project.properties
-        sed -i "s|@PROJECT_NAME@|${{ inputs.project-name }}|g" sonar-project.properties
-        sed -i "s|@ORGANIZATION@|${{ inputs.organization }}|g" sonar-project.properties
-        sed -i "s|@SOURCES@|${{ inputs.sources }}|g" sonar-project.properties
-        sed -i "s|@COVERAGE_REPORT@|${{ inputs.coverage-report }}|g" sonar-project.properties
-        sed -i "s|@EXCLUSIONS@|${{ inputs.exclusions }}|g" sonar-project.properties
-
-    - name: Validate Sonar Token
-      shell: bash
-      run: |
-        curl -u "${{ inputs.sonar-token }}:" \
-          "https://sonarcloud.io/api/authentication/validate"
-
-    - name: Check Sonar Project
-      shell: bash
-      run: |
-        curl -u "${{ inputs.sonar-token }}:" \
-          "https://sonarcloud.io/api/components/show?organization=${{ inputs.organization }}&component=${{ inputs.project-key }}"
+        cat > sonar-project.properties <<EOF
+        sonar.projectKey=${{ inputs.project-key }}
+        sonar.projectName=${{ inputs.project-name }}
+        sonar.organization=${{ inputs.organization }}
+        sonar.sources=${{ inputs.sources }}
+        sonar.sourceEncoding=UTF-8
+        sonar.python.coverage.reportPaths=${{ inputs.coverage-report }}
+        sonar.exclusions=${{ inputs.exclusions }}
+        EOF
 
     - name: Verify generated properties
       shell: bash
@@ -68,7 +57,7 @@ runs:
         cat sonar-project.properties
 
     - name: Run SonarCloud Scan
-      uses: SonarSource/sonarqube-scan-action@v5
+      uses: SonarSource/sonarqube-scan-action@v8
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       with:
