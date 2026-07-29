@@ -91,4 +91,3 @@ runs:
       with:
         args: >
           -Dproject.settings=sonar-project.properties
-          -Dsonar.qualitygate.wait=true
