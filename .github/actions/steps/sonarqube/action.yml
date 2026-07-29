@@ -33,14 +33,40 @@ inputs:
     description: SonarCloud Token
     required: true
 
+  sonar-host-url:
+    description: SonarCloud Host URL
+    required: false
+    default: "https://sonarcloud.io"
+
 runs:
   using: composite
 
   steps:
-    - name: Generate sonar-project.properties
+    - name: Prepare sonar-project.properties
       shell: bash
       run: |
-        cat > sonar-project.properties <<EOF
+        if [ -f sonar-project.properties ]; then
+          echo "Found existing sonar-project.properties, preserving repo configuration."
+          if ! grep -q "sonar.host.url" sonar-project.properties; then
+            echo "sonar.host.url=${{ inputs.sonar-host-url }}" >> sonar-project.properties
+          fi
+          if ! grep -q "sonar.projectKey" sonar-project.properties; then
+            echo "sonar.projectKey=${{ inputs.project-key }}" >> sonar-project.properties
+          fi
+          if ! grep -q "sonar.organization" sonar-project.properties; then
+            echo "sonar.organization=${{ inputs.organization }}" >> sonar-project.properties
+          fi
+          if [ -n "${{ inputs.exclusions }}" ]; then
+            if grep -q "sonar.exclusions" sonar-project.properties; then
+              sed -i "s|sonar.exclusions=\(.*\)|sonar.exclusions=\1,${{ inputs.exclusions }}|g" sonar-project.properties
+            else
+              echo "sonar.exclusions=${{ inputs.exclusions }}" >> sonar-project.properties
+            fi
+          fi
+        else
+          echo "No sonar-project.properties found. Generating new properties file."
+          cat > sonar-project.properties <<EOF
+        sonar.host.url=${{ inputs.sonar-host-url }}
         sonar.projectKey=${{ inputs.project-key }}
         sonar.projectName=${{ inputs.project-name }}
         sonar.organization=${{ inputs.organization }}
@@ -49,6 +75,7 @@ runs:
         sonar.python.coverage.reportPaths=${{ inputs.coverage-report }}
         sonar.exclusions=${{ inputs.exclusions }}
         EOF
+        fi
 
     - name: Verify generated properties
       shell: bash
@@ -60,6 +87,7 @@ runs:
       uses: SonarSource/sonarqube-scan-action@v8
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
+        SONAR_HOST_URL: ${{ inputs.sonar-host-url }}
       with:
         args: >
           -Dproject.settings=sonar-project.properties

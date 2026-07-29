@@ -25,7 +25,31 @@ on:
         description: Run SonarQube analysis
         required: false
         type: boolean
-        default: false
+        default: true
+
+      sonar-project-key:
+        description: Sonar project key (defaults to owner_repo)
+        required: false
+        type: string
+        default: ""
+
+      sonar-project-name:
+        description: Sonar project name (defaults to repo name)
+        required: false
+        type: string
+        default: ""
+
+      sonar-organization:
+        description: Sonar organization (defaults to owner)
+        required: false
+        type: string
+        default: ""
+
+      sonar-sources:
+        description: Sonar sources directory
+        required: false
+        type: string
+        default: "."
 
     secrets:
       SONAR_TOKEN:
@@ -81,12 +105,12 @@ jobs:
             htmlcov/
 
       - name: SAST / SonarQube Analysis
-        if: ${{ inputs.run-sonar == true }}
+        if: ${{ inputs.run-sonar == true && secrets.SONAR_TOKEN != '' }}
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
-          project-key: irajatpandey_Learning-Github-Actions
-          project-name: Learning-Github-Actions
-          organization: irajatpandey
-          sources: .
+          project-key: ${{ inputs.sonar-project-key != '' && inputs.sonar-project-key || format('{0}_{1}', github.repository_owner, github.event.repository.name) }}
+          project-name: ${{ inputs.sonar-project-name != '' && inputs.sonar-project-name || github.event.repository.name }}
+          organization: ${{ inputs.sonar-organization != '' && inputs.sonar-organization || github.repository_owner }}
+          sources: ${{ inputs.sonar-sources }}
           exclusions: ${{ inputs.exclusions }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
