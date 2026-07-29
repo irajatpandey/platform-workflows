@@ -118,5 +118,6 @@ runs:
           -Dsonar.organization=${{ inputs.organization }}
           -Dsonar.projectKey=${{ inputs.project-key }}
           -Dsonar.host.url=${{ inputs.sonar-host-url }}
+          -Dsonar.token=${{ inputs.sonar-token }}
           -Dsonar.qualitygate.wait=true
           -Dsonar.verbose=true
