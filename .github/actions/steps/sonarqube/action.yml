@@ -83,6 +83,18 @@ runs:
         echo "===== sonar-project.properties ====="
         cat sonar-project.properties
 
+    - name: Validate Sonar Token Presence
+      shell: bash
+      env:
+        TOKEN: ${{ inputs.sonar-token }}
+      run: |
+        if [ -z "$TOKEN" ]; then
+          echo "::error::SONAR_TOKEN is empty! Please ensure SONAR_TOKEN secret is defined in Learning-Github-Actions."
+          exit 1
+        else
+          echo "SONAR_TOKEN is present (length: ${#TOKEN} characters)."
+        fi
+
     - name: Run SonarCloud Scan
       uses: SonarSource/sonarqube-scan-action@v8
       env:
