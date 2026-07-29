@@ -123,3 +123,12 @@ jobs:
           path: |
             reports/sonarqube-report.html
             reports/sonarqube-report.zip
+
+      - name: Publish SonarQube HTML Report to GitHub Pages
+        if: ${{ always() && inputs.run-sonar == true }}
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./reports
+          destination_dir: sonar-reports
+          keep_files: true
