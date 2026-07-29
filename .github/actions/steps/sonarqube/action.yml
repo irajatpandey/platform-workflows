@@ -117,11 +117,8 @@ runs:
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
       with:
+        projectBaseDir: .
         args: >
-          -Dproject.settings=sonar-project.properties
           -Dsonar.organization=${{ inputs.organization }}
           -Dsonar.projectKey=${{ inputs.project-key }}
-          -Dsonar.token=${{ inputs.sonar-token }}
-          -Dsonar.login=${{ inputs.sonar-token }}
           -Dsonar.qualitygate.wait=true
-          -Dsonar.verbose=true
