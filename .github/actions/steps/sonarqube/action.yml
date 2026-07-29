@@ -56,6 +56,9 @@ runs:
           if ! grep -q "sonar.organization" sonar-project.properties; then
             echo "sonar.organization=${{ inputs.organization }}" >> sonar-project.properties
           fi
+          if ! grep -q "sonar.token" sonar-project.properties; then
+            echo "sonar.token=${{ inputs.sonar-token }}" >> sonar-project.properties
+          fi
           if [ -n "${{ inputs.exclusions }}" ]; then
             if grep -q "sonar.exclusions" sonar-project.properties; then
               sed -i "s|sonar.exclusions=\(.*\)|sonar.exclusions=\1,${{ inputs.exclusions }}|g" sonar-project.properties
@@ -70,6 +73,7 @@ runs:
         sonar.projectKey=${{ inputs.project-key }}
         sonar.projectName=${{ inputs.project-name }}
         sonar.organization=${{ inputs.organization }}
+        sonar.token=${{ inputs.sonar-token }}
         sonar.sources=${{ inputs.sources }}
         sonar.sourceEncoding=UTF-8
         sonar.python.coverage.reportPaths=${{ inputs.coverage-report }}
@@ -81,7 +85,8 @@ runs:
       shell: bash
       run: |
         echo "===== sonar-project.properties ====="
-        cat sonar-project.properties
+        grep -v "sonar.token" sonar-project.properties
+        echo "sonar.token=[REDACTED]"
 
     - name: Pre-scan Validation Checks & Quality Gate API Test
       shell: bash
@@ -116,5 +121,7 @@ runs:
           -Dproject.settings=sonar-project.properties
           -Dsonar.organization=${{ inputs.organization }}
           -Dsonar.projectKey=${{ inputs.project-key }}
+          -Dsonar.token=${{ inputs.sonar-token }}
+          -Dsonar.login=${{ inputs.sonar-token }}
           -Dsonar.qualitygate.wait=true
           -Dsonar.verbose=true
