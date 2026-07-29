@@ -123,4 +123,7 @@ runs:
       with:
         args: >
           -Dproject.settings=sonar-project.properties
+          -Dsonar.organization=${{ inputs.organization }}
+          -Dsonar.projectKey=${{ inputs.project-key }}
+          -Dsonar.host.url=${{ inputs.sonar-host-url }}
           -Dsonar.qualitygate.wait=true
