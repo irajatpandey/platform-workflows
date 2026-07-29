@@ -106,7 +106,7 @@ jobs:
 
       - name: SAST / SonarQube Analysis
         if: ${{ inputs.run-sonar == true }}
-        uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@ci/enable-sonar-toggle
+        uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
           project-key: ${{ inputs.sonar-project-key != '' && inputs.sonar-project-key || format('{0}_{1}', github.repository_owner, github.event.repository.name) }}
           project-name: ${{ inputs.sonar-project-name != '' && inputs.sonar-project-name || github.event.repository.name }}
