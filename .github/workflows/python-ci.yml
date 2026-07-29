@@ -21,6 +21,12 @@ on:
         type: string
         default: "17"
 
+      run-sonar:
+        description: Run SonarQube analysis
+        required: false
+        type: boolean
+        default: false
+
     secrets:
       SONAR_TOKEN:
         required: false
@@ -74,12 +80,8 @@ jobs:
             coverage.xml
             htmlcov/
 
-      - name: Skip SonarQube Analysis
-        if: ${{ secrets.SONAR_TOKEN == '' }}
-        run: echo "SONAR_TOKEN is not configured; skipping SonarQube analysis."
-
       - name: SAST / SonarQube Analysis
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: ${{ inputs.run-sonar == true }}
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
           project-key: irajatpandey_Learning-Github-Actions
