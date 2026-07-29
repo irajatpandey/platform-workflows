@@ -23,7 +23,7 @@ on:
 
     secrets:
       SONAR_TOKEN:
-        required: true
+        required: false
 
 jobs:
   python-ci:
@@ -74,7 +74,12 @@ jobs:
             coverage.xml
             htmlcov/
 
+      - name: Skip SonarQube Analysis
+        if: ${{ secrets.SONAR_TOKEN == '' }}
+        run: echo "SONAR_TOKEN is not configured; skipping SonarQube analysis."
+
       - name: SAST / SonarQube Analysis
+        if: ${{ secrets.SONAR_TOKEN != '' }}
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
           project-key: irajatpandey_Learning-Github-Actions
