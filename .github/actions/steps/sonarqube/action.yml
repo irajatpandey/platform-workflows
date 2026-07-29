@@ -83,38 +83,6 @@ runs:
         echo "===== sonar-project.properties ====="
         cat sonar-project.properties
 
-    - name: Validate Sonar Token Presence
-      shell: bash
-      env:
-        TOKEN: ${{ inputs.sonar-token }}
-      run: |
-        if [ -z "$TOKEN" ]; then
-          echo "::error::SONAR_TOKEN is empty! Please ensure SONAR_TOKEN secret is defined in Learning-Github-Actions."
-          exit 1
-        else
-          echo "SONAR_TOKEN is present (length: ${#TOKEN} characters)."
-        fi
-
-    - name: Validate SonarCloud API Auth & Project
-      shell: bash
-      env:
-        SONAR_TOKEN: ${{ inputs.sonar-token }}
-        PROJECT_KEY: ${{ inputs.project-key }}
-        ORGANIZATION: ${{ inputs.organization }}
-      run: |
-        echo "Validating token with SonarCloud API..."
-        AUTH_RESP=$(curl -s -o /dev/null -w "%{http_code}" -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/authentication/validate")
-        echo "SonarCloud auth validation HTTP status: $AUTH_RESP"
-        if [ "$AUTH_RESP" != "200" ]; then
-          echo "::error::SonarCloud API authentication failed! (HTTP Status: $AUTH_RESP). The SONAR_TOKEN secret is invalid, revoked, or incorrectly copied into GitHub secrets."
-        else
-          echo "✓ SonarCloud Token is valid!"
-        fi
-
-        echo "Checking project visibility for organization '$ORGANIZATION' and project '$PROJECT_KEY'..."
-        PROJ_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/components/show?component=${PROJECT_KEY}")
-        echo "SonarCloud project check HTTP status: $PROJ_HTTP"
-
     - name: Run SonarCloud Scan
       uses: SonarSource/sonarqube-scan-action@v8
       env:
@@ -123,7 +91,4 @@ runs:
       with:
         args: >
           -Dproject.settings=sonar-project.properties
-          -Dsonar.organization=${{ inputs.organization }}
-          -Dsonar.projectKey=${{ inputs.project-key }}
-          -Dsonar.host.url=${{ inputs.sonar-host-url }}
           -Dsonar.qualitygate.wait=true
