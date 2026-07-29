@@ -122,3 +122,20 @@ runs:
           -Dsonar.organization=${{ inputs.organization }}
           -Dsonar.projectKey=${{ inputs.project-key }}
           -Dsonar.qualitygate.wait=true
+
+    - name: Generate & Package SonarCloud HTML Dashboard Report
+      if: always()
+      shell: bash
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+        PROJECT_KEY: ${{ inputs.project-key }}
+        ORGANIZATION: ${{ inputs.organization }}
+        SONAR_HOST_URL: ${{ inputs.sonar-host-url }}
+      run: |
+        mkdir -p reports
+        python3 "${{ github.action_path }}/generate_sonarqube_report.py"
+        if [ -f reports/sonarqube-report.html ]; then
+          cd reports
+          zip -r sonarqube-report.zip sonarqube-report.html
+          ls -la
+        fi

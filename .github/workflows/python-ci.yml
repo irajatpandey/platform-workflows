@@ -114,3 +114,12 @@ jobs:
           sources: ${{ inputs.sonar-sources }}
           exclusions: ${{ inputs.exclusions }}
           sonar-token: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Upload SonarQube HTML Report Artifact
+        if: ${{ always() && inputs.run-sonar == true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonarqube-html-report
+          path: |
+            reports/sonarqube-report.html
+            reports/sonarqube-report.zip
