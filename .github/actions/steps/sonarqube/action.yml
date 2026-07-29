@@ -83,7 +83,31 @@ runs:
         echo "===== sonar-project.properties ====="
         cat sonar-project.properties
 
-    - name: Run SonarCloud Scan
+    - name: Pre-scan Validation Checks & Quality Gate API Test
+      shell: bash
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar-token }}
+        PROJECT_KEY: ${{ inputs.project-key }}
+        ORGANIZATION: ${{ inputs.organization }}
+      run: |
+        echo "=== [1/3] Token Presence Check ==="
+        if [ -z "$SONAR_TOKEN" ]; then
+          echo "::error::SONAR_TOKEN is EMPTY!"
+          exit 1
+        else
+          echo "✓ SONAR_TOKEN is present (length: ${#SONAR_TOKEN} chars)"
+        fi
+
+        echo "=== [2/3] SonarCloud Auth Validation ==="
+        AUTH_RESP=$(curl -s -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/authentication/validate")
+        echo "Auth validation API response: $AUTH_RESP"
+
+        echo "=== [3/3] SonarCloud Quality Gate API Check ==="
+        QG_RESP=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -u "${SONAR_TOKEN}:" "https://sonarcloud.io/api/qualitygates/project_status?projectKey=${PROJECT_KEY}&organization=${ORGANIZATION}")
+        echo "Quality Gate API response:"
+        echo "$QG_RESP"
+
+    - name: Run SonarCloud Scan & Wait for Quality Gate
       uses: SonarSource/sonarqube-scan-action@v8
       env:
         SONAR_TOKEN: ${{ inputs.sonar-token }}
@@ -91,3 +115,8 @@ runs:
       with:
         args: >
           -Dproject.settings=sonar-project.properties
+          -Dsonar.organization=${{ inputs.organization }}
+          -Dsonar.projectKey=${{ inputs.project-key }}
+          -Dsonar.host.url=${{ inputs.sonar-host-url }}
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.verbose=true
