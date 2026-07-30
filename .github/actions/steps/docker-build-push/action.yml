@@ -40,12 +40,16 @@ runs:
 
         echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
 
-        FULL_REPO="${DOCKERHUB_USER}/${IMG_NAME}"
-        echo "=== [2/3] Building Docker Image: ${FULL_REPO}:${IMG_TAG} ==="
-        docker build -t "${FULL_REPO}:${IMG_TAG}" -t "${FULL_REPO}:latest" .
+        USER_LOWER=$(echo "$DOCKERHUB_USER" | tr '[:upper:]' '[:lower:]')
+        NAME_LOWER=$(echo "$IMG_NAME" | tr '[:upper:]' '[:lower:]')
+        TAG_LOWER=$(echo "$IMG_TAG" | tr '[:upper:]' '[:lower:]')
+
+        FULL_REPO="${USER_LOWER}/${NAME_LOWER}"
+        echo "=== [2/3] Building Docker Image: ${FULL_REPO}:${TAG_LOWER} ==="
+        docker build -t "${FULL_REPO}:${TAG_LOWER}" -t "${FULL_REPO}:latest" .
 
         echo "=== [3/3] Publishing Image to Docker Hub Registry ==="
-        docker push "${FULL_REPO}:${IMG_TAG}"
+        docker push "${FULL_REPO}:${TAG_LOWER}"
         docker push "${FULL_REPO}:latest"
 
-        echo "✓ Successfully built and published ${FULL_REPO}:${IMG_TAG} to Docker Hub!"
+        echo "✓ Successfully built and published ${FULL_REPO}:${TAG_LOWER} to Docker Hub!"
