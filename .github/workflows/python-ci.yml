@@ -133,7 +133,6 @@ jobs:
             htmlcov/
 
       - name: SAST / SonarQube Analysis
-        if: ${{ inputs.run-sonar == true }}
         uses: irajatpandey/platform-workflows/.github/actions/steps/sonarqube@master
         with:
           project-key: ${{ inputs.sonar-project-key != '' && inputs.sonar-project-key || format('{0}_{1}', github.repository_owner, github.event.repository.name) }}
@@ -144,7 +143,7 @@ jobs:
           sonar-token: ${{ secrets.SONAR_TOKEN }}
 
       - name: Upload SonarQube HTML Report Artifact
-        if: ${{ always() && inputs.run-sonar == true }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: sonarqube-html-report
@@ -153,7 +152,7 @@ jobs:
             reports/sonarqube-report.zip
 
       - name: Publish SonarQube HTML Report to GitHub Pages
-        if: ${{ always() && inputs.run-sonar == true }}
+        if: always()
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
