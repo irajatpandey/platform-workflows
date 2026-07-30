@@ -149,24 +149,8 @@ jobs:
             reports/sonarqube-report.html
             reports/sonarqube-report.zip
 
-      - name: Publish SonarQube HTML Report to GitHub Pages
-        if: always()
-        continue-on-error: true
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./reports
-          destination_dir: sonar-reports
-          keep_files: true
-
       - name: Nexus IQ Policy Scan
         uses: irajatpandey/platform-workflows/.github/actions/steps/nexus-scan@master
-        with:
-          nexus-url: ${{ inputs.nexus-url }}
-          application-id: ${{ inputs.nexus-app-id != '' && inputs.nexus-app-id || github.event.repository.name }}
-          stage: ${{ inputs.nexus-stage }}
-          nexus-username: ${{ secrets.NEXUS_USERNAME }}
-          nexus-password: ${{ secrets.NEXUS_PASSWORD }}
 
       - name: Upload Nexus Scan Report Artifact
         if: always()
@@ -186,6 +170,29 @@ jobs:
           name: checkov-report
           path: |
             reports/checkov-*
+
+      - name: Generate Security Portal Index
+        if: always()
+        shell: bash
+        run: |
+          python3 .github/actions/steps/upload-artifact/generate_portal_index.py || true
+
+      - name: Upload Unified Security Portal Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unified-security-portal
+          path: |
+            reports/*.html
+
+      - name: Publish Unified Security Portal to GitHub Pages
+        if: always()
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./reports
+          keep_files: true
 
       - name: Build & Push Docker Image to Registry
         uses: irajatpandey/platform-workflows/.github/actions/steps/docker-build-push@master

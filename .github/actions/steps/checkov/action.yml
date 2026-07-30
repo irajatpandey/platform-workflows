@@ -23,3 +23,9 @@ runs:
 
         echo "=== Checkov Output Reports ==="
         ls -la reports/
+
+    - name: Generate Checkov HTML Dashboard Report
+      if: always()
+      shell: bash
+      run: |
+        python3 "${{ github.action_path }}/generate_checkov_report.py"

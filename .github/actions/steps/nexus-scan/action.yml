@@ -81,3 +81,9 @@ runs:
 
         echo "=== Nexus Scan Output Reports ==="
         ls -la reports/
+
+    - name: Generate Nexus HTML Dashboard Report
+      if: always()
+      shell: bash
+      run: |
+        python3 "${{ github.action_path }}/generate_nexus_report.py"
