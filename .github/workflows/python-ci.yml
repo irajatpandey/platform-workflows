@@ -51,12 +51,6 @@ on:
         type: string
         default: "."
 
-      run-nexus:
-        description: Run Nexus IQ dependency policy scan
-        required: false
-        type: boolean
-        default: true
-
       nexus-url:
         description: Nexus IQ Server URL
         required: false
@@ -161,7 +155,6 @@ jobs:
           keep_files: true
 
       - name: Nexus IQ Policy Scan
-        if: ${{ inputs.run-nexus == true }}
         uses: irajatpandey/platform-workflows/.github/actions/steps/nexus-scan@master
         with:
           nexus-url: ${{ inputs.nexus-url }}
@@ -171,7 +164,7 @@ jobs:
           nexus-password: ${{ secrets.NEXUS_PASSWORD }}
 
       - name: Upload Nexus Scan Report Artifact
-        if: ${{ always() && inputs.run-nexus == true }}
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: nexus-report
