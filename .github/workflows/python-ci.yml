@@ -51,8 +51,36 @@ on:
         type: string
         default: "."
 
+      run-nexus:
+        description: Run Nexus IQ dependency policy scan
+        required: false
+        type: boolean
+        default: true
+
+      nexus-url:
+        description: Nexus IQ Server URL
+        required: false
+        type: string
+        default: ""
+
+      nexus-app-id:
+        description: Nexus Application ID
+        required: false
+        type: string
+        default: ""
+
+      nexus-stage:
+        description: Nexus Lifecycle Stage (build, stage-release, release)
+        required: false
+        type: string
+        default: "build"
+
     secrets:
       SONAR_TOKEN:
+        required: false
+      NEXUS_USERNAME:
+        required: false
+      NEXUS_PASSWORD:
         required: false
 
 jobs:
@@ -132,3 +160,21 @@ jobs:
           publish_dir: ./reports
           destination_dir: sonar-reports
           keep_files: true
+
+      - name: Nexus IQ Policy Scan
+        if: ${{ inputs.run-nexus == true }}
+        uses: irajatpandey/platform-workflows/.github/actions/steps/nexus-scan@master
+        with:
+          nexus-url: ${{ inputs.nexus-url }}
+          application-id: ${{ inputs.nexus-app-id != '' && inputs.nexus-app-id || github.event.repository.name }}
+          stage: ${{ inputs.nexus-stage }}
+          nexus-username: ${{ secrets.NEXUS_USERNAME }}
+          nexus-password: ${{ secrets.NEXUS_PASSWORD }}
+
+      - name: Upload Nexus Scan Report Artifact
+        if: ${{ always() && inputs.run-nexus == true }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: nexus-report
+          path: |
+            reports/nexus-*

@@ -91,6 +91,10 @@ jobs:
 | `python-version` | `string` | `"3.12"` | Python version to set up |
 | `java-version` | `string` | `"17"` | Java JDK version (required by SonarScanner) |
 | `run-sonar` | `boolean` | `true` | Toggle SonarCloud SAST analysis |
+| `run-nexus` | `boolean` | `true` | Toggle Nexus IQ dependency policy scan |
+| `nexus-url` | `string` | `""` | Nexus IQ Server URL |
+| `nexus-app-id` | `string` | `""` *(auto)* | Nexus Application ID (defaults to repo name) |
+| `nexus-stage` | `string` | `"build"` | Nexus Lifecycle stage (`build`, `stage-release`, `release`) |
 | `exclusions` | `string` | `""` | File exclusion patterns for SonarCloud |
 | `sonar-project-key` | `string` | `""` *(auto)* | Defaults to `{owner}_{repo}` |
 | `sonar-project-name` | `string` | `""` *(auto)* | Defaults to `{repo}` |
@@ -101,7 +105,9 @@ jobs:
 
 | Secret | Description |
 | :--- | :--- |
-| `SONAR_TOKEN` | SonarCloud User Access Token (configured in caller repository secrets) |
+| `SONAR_TOKEN` | SonarCloud User Access Token |
+| `NEXUS_USERNAME` | Nexus IQ Username (optional for online policy evaluation) |
+| `NEXUS_PASSWORD` | Nexus IQ Password / Token (optional for online policy evaluation) |
 
 ---
 
