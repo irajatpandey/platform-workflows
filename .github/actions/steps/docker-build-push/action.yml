@@ -1,0 +1,51 @@
+name: Docker Build & Push to Registry
+description: Build Dockerfile and publish container image to Docker Hub registry
+
+inputs:
+  image-name:
+    description: Docker image name
+    required: false
+    default: ""
+
+  image-tag:
+    description: Docker image tag
+    required: false
+    default: ""
+
+  dockerhub-username:
+    description: Docker Hub Username
+    required: true
+
+  dockerhub-token:
+    description: Docker Hub Access Token / Password
+    required: true
+
+runs:
+  using: composite
+
+  steps:
+    - name: Build & Publish Docker Container Image
+      shell: bash
+      env:
+        DOCKERHUB_USER: ${{ inputs.dockerhub-username }}
+        DOCKERHUB_TOKEN: ${{ inputs.dockerhub-token }}
+        IMG_NAME: ${{ inputs.image-name }}
+        IMG_TAG: ${{ inputs.image-tag }}
+      run: |
+        echo "=== [1/3] Docker Registry Authentication ==="
+        if [ -z "$DOCKERHUB_USER" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
+          echo "::warning::DOCKERHUB_USERNAME or DOCKERHUB_TOKEN secrets not provided. Skipping registry publish."
+          exit 0
+        fi
+
+        echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USER" --password-stdin
+
+        FULL_REPO="${DOCKERHUB_USER}/${IMG_NAME}"
+        echo "=== [2/3] Building Docker Image: ${FULL_REPO}:${IMG_TAG} ==="
+        docker build -t "${FULL_REPO}:${IMG_TAG}" -t "${FULL_REPO}:latest" .
+
+        echo "=== [3/3] Publishing Image to Docker Hub Registry ==="
+        docker push "${FULL_REPO}:${IMG_TAG}"
+        docker push "${FULL_REPO}:latest"
+
+        echo "✓ Successfully built and published ${FULL_REPO}:${IMG_TAG} to Docker Hub!"

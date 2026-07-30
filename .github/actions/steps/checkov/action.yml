@@ -1,0 +1,25 @@
+name: Checkov IaC & Dockerfile Security Scan
+description: Scan Dockerfile and Infrastructure-as-Code files using Checkov
+
+runs:
+  using: composite
+
+  steps:
+    - name: Run Checkov Security Audit
+      shell: bash
+      run: |
+        mkdir -p reports
+        echo "=== [1/2] Installing Checkov Scanner ==="
+        pip install checkov || true
+
+        echo "=== [2/2] Running Checkov Security Audit ==="
+        if [ -f Dockerfile ]; then
+          echo "Scanning Dockerfile with Checkov..."
+          checkov -f Dockerfile -o cli -o json --output-file-path console,reports/checkov-report.json || echo "Checkov scan finished with policy findings."
+        else
+          echo "No Dockerfile found in root; scanning directory..."
+          checkov -d . -o cli -o json --output-file-path console,reports/checkov-report.json || echo "Checkov scan finished with policy findings."
+        fi
+
+        echo "=== Checkov Output Reports ==="
+        ls -la reports/

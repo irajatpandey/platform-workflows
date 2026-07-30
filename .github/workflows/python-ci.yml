@@ -76,6 +76,10 @@ on:
         required: false
       NEXUS_PASSWORD:
         required: false
+      DOCKERHUB_USERNAME:
+        required: false
+      DOCKERHUB_TOKEN:
+        required: false
 
 jobs:
   python-ci:
@@ -170,3 +174,22 @@ jobs:
           name: nexus-report
           path: |
             reports/nexus-*
+
+      - name: Checkov IaC / Dockerfile Security Scan
+        uses: irajatpandey/platform-workflows/.github/actions/steps/checkov@master
+
+      - name: Upload Checkov Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-report
+          path: |
+            reports/checkov-*
+
+      - name: Build & Push Docker Image to Registry
+        uses: irajatpandey/platform-workflows/.github/actions/steps/docker-build-push@master
+        with:
+          image-name: ${{ github.event.repository.name }}
+          image-tag: ${{ github.sha }}
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}

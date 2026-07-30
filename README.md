@@ -11,6 +11,9 @@ platform-workflows/
 ├── .github/
 │   ├── actions/
 │   │   └── steps/                    # Reusable Composite Actions
+│   │       ├── checkov/              # IaC & Dockerfile security scanning
+│   │       ├── docker-build-push/    # Docker image build & Docker Hub registry push
+│   │       ├── nexus-scan/           # Sonatype Nexus IQ dependency policy audit
 │   │       ├── run-gitleaks/         # Secret scanning with Gitleaks & HTML report generation
 │   │       ├── setup-java/           # Java SDK environment setup
 │   │       ├── setup-python/         # Python environment setup
