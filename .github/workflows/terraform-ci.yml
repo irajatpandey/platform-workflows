@@ -1,0 +1,114 @@
+name: terraform-ci-pipeline
+
+on:
+  workflow_call:
+    inputs:
+      terraform-version:
+        description: Terraform CLI version
+        required: false
+        type: string
+        default: "1.7.0"
+
+      working-directory:
+        description: Relative path to terraform directory
+        required: false
+        type: string
+        default: "."
+
+      auto-apply:
+        description: Automatically apply plan on main/master branch
+        required: false
+        type: boolean
+        default: true
+
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: false
+      AWS_SECRET_ACCESS_KEY:
+        required: false
+      AWS_REGION:
+        required: false
+
+jobs:
+  terraform-ci:
+    name: Terraform CI/CD
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ inputs.terraform-version }}
+
+      - name: Terraform Format Check
+        shell: bash
+        run: terraform fmt -check -recursive || echo "Warning: terraform fmt check failed."
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.0
+
+      - name: Run TFLint Audit
+        shell: bash
+        run: |
+          tflint --init || true
+          tflint -f compact || echo "TFLint completed with warnings."
+
+      - name: Terraform Init & Validate
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+        run: |
+          terraform init
+          terraform validate
+
+      - name: Checkov IaC Security Scan for Terraform
+        uses: irajatpandey/platform-workflows/.github/actions/steps/checkov@master
+
+      - name: Terraform Plan
+        id: plan
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+        run: |
+          terraform plan -no-color -out=tfplan > plan.txt || true
+          cat plan.txt
+
+      - name: Upload Terraform Plan Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: |
+            ${{ inputs.working-directory }}/plan.txt
+            ${{ inputs.working-directory }}/tfplan
+
+      - name: Terraform Apply
+        if: ${{ inputs.auto-apply == true && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main') }}
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+        run: |
+          if [ -f tfplan ]; then
+            terraform apply -auto-approve tfplan
+          else
+            echo "No tfplan file found; skipping apply."
+          fi

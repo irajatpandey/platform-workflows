@@ -1,0 +1,31 @@
+name: terraform-apply-pipeline
+
+on:
+  workflow_call:
+    inputs:
+      terraform-version:
+        description: Terraform CLI version
+        required: false
+        type: string
+        default: "1.7.0"
+      working-directory:
+        description: Relative path to terraform directory
+        required: false
+        type: string
+        default: "."
+    secrets:
+      AWS_ACCESS_KEY_ID:
+        required: false
+      AWS_SECRET_ACCESS_KEY:
+        required: false
+      AWS_REGION:
+        required: false
+
+jobs:
+  terraform-apply:
+    uses: irajatpandey/platform-workflows/.github/workflows/terraform-ci.yml@master
+    with:
+      terraform-version: ${{ inputs.terraform-version }}
+      working-directory: ${{ inputs.working-directory }}
+      auto-apply: true
+    secrets: inherit

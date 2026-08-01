@@ -22,13 +22,15 @@ platform-workflows/
 │   │
 │   └── workflows/                    # Reusable Workflows (workflow_call)
 │       ├── python-ci.yml             # Python CI pipeline (test, coverage, gitleaks, SonarCloud)
+│       ├── terraform-ci.yml          # Terraform CI/CD (fmt, tflint, validate, checkov, plan, apply)
+│       ├── terraform-plan.yml        # Terraform speculative plan workflow
+│       ├── terraform-apply.yml       # Terraform apply deployment workflow
 │       ├── java-ci.yml               # Java CI pipeline
 │       ├── node-ci.yml               # Node.js CI pipeline
 │       ├── go-ci.yml                 # Go CI pipeline
 │       ├── docker-build.yml          # Container image build & push
 │       ├── helm-deploy.yml           # Helm deployment pipeline
-│       ├── security.yml              # Security & vulnerability scanning
-│       └── ...                       # Additional platform pipelines
+│       └── security.yml              # Security & vulnerability scanning
 └── README.md
 ```
 
